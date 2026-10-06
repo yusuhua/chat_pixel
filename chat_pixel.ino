@@ -108,6 +108,7 @@ bool chatButtonStableState = HIGH;
 uint32_t chatButtonChangedMs = 0;
 MatrixPanel_I2S_DMA *dma_display = nullptr;
 AnimatedGIF gif;
+const int32_t defaultBrightness = 40;
 Preferences prefs;
 
 void drawIcon(const uint16_t *icon, int16_t x, int16_t y, int16_t width, int16_t height ) {
@@ -304,7 +305,7 @@ void registerGetBrightnessMcp() {
   tool.description = "Get the current screen brightness from 0 to 100 percent.";
   tool.handler = [](const xiaozhi::McpArguments& arguments) {
     prefs.begin("screen", false);
-    int32_t screenBrightness = prefs.getInt("brightness");
+    int32_t screenBrightness = prefs.getInt("brightness", defaultBrightness);
     prefs.end();
     Serial.printf("[mcp] get brightness: %ld%%\n", static_cast<long>(screenBrightness));
     return xiaozhi::McpResult::Integer(screenBrightness);
@@ -340,7 +341,7 @@ void setup() {
   dma_display = new MatrixPanel_I2S_DMA(mxconfig);
   dma_display->begin();
   prefs.begin("screen", false);
-  int32_t screenBrightness = prefs.getInt("brightness", 40);
+  int32_t screenBrightness = prefs.getInt("brightness", defaultBrightness);
   prefs.end();
   uint8_t brightness8 = static_cast<uint8_t>((screenBrightness * 255) / 100);
   dma_display->setBrightness8(brightness8);
